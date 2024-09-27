@@ -1,0 +1,24 @@
+pipeline{
+    agent any
+    stages{
+        stage('Build') {
+            steps{
+                // clean the package -B is for user -D is used to skip the file
+                sh 'mvn -B -DskipTests clean package'
+            }
+        }
+        stage('Test') {
+            steps{
+                sh 'mvn test'
+            }
+            // change user 
+            post{
+                always{
+                    junit 'target/surefire-reports/*.xml'
+                    sh 'junit-viewer --results=target/surefire-reports --save=report.html'
+                }
+            }
+        }
+
+    }
+}
